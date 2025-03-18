@@ -6,11 +6,16 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import authRoutes from './routes/authRoutes.js';
+const bodyParser = require('body-parser');
+const patientRoutes = require('./routes/patientRoutes');
 
 // Initialize dotenv
 dotenv.config();
 
 const app = express();
+app.use(bodyParser.json());
+app.use('/uploads', express.static('uploads')); // Serve uploaded files
+app.use('/api/patient', patientRoutes);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
