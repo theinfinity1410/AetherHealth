@@ -1,8 +1,9 @@
-import { DataTypes } from 'sequelize';
-import { sequelize } from '../config/db.js';
-import { v4 as uuidv4 } from 'uuid';
+import { DataTypes } from "sequelize";
+import { sequelize } from "../config/db.js";
+import { v4 as uuidv4 } from "uuid";
+import { uuidToShort } from "../utils/shortId.js";
 
-const Doctor = sequelize.define('Doctor', {
+const Doctor = sequelize.define("Doctor", {
     doctor_id: {
         type: DataTypes.UUID,
         defaultValue: uuidv4,
@@ -16,30 +17,18 @@ const Doctor = sequelize.define('Doctor', {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
-        validate: { isEmail: true }
+        validate: { isEmail: true },
     },
     password: {
         type: DataTypes.STRING,
         allowNull: false,
-        // validate: {
-        //     customValidator(value) {
-        //         if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value)) {
-        //             throw new Error('Password must include one uppercase letter, one number, and one special character.');
-        //         }
-        //     },
-        // }
     },
-},
-// {
-//     hooks: {
-//         beforeCreate: async (patient) => {
-//             patient.password = await bcrypt.hash(patient.password, 10);
-//         },
-//         beforeUpdate: async (patient) => {
-//             patient.password = await bcrypt.hash(patient.password, 10);
-//         },
-//     },
-// }
-);
+}, {
+    getterMethods: {
+        short_id() {
+            return uuidToShort(this.doctor_id); // Compute short ID dynamically
+        }
+    }
+});
 
 export default Doctor;
