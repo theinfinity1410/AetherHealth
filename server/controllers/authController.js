@@ -34,8 +34,9 @@ export const doctorSignup = async (req, res) => {
 /** ✅ Patient Signup (Requires a valid Doctor ID) */
 export const patientSignup = async (req, res) => {
     try {
-        const { name, email, password, doc_id } = req.body;
+        const { name, email, password, short_id } = req.body;
 
+        doc_id = shortToUuid(short_id);
         // Check if the Doctor exists
         const doctor = await Doctor.findByPk(doc_id);
         if (!doctor) return res.status(400).json({ message: 'Invalid Doctor ID' });
