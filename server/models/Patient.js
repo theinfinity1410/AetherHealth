@@ -42,7 +42,11 @@ const Patient = sequelize.define('Patient', {
     medic_data:{
         type: DataTypes.JSON,
         allowNull: true,
-    }
+    },
+    ai_recommendations:{
+        type: DataTypes.JSON,
+        allowNull: true,
+    },
 },
 // {
 //     hooks: {
