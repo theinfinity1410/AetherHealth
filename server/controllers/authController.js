@@ -19,9 +19,12 @@ export const doctorSignup = async (req, res) => {
             password: hashedPassword,
         });
 
+        const shortId = uuidToShort(newDoctor.doctor_id);
+
         res.status(201).json({
             message: 'Doctor registered successfully',
-            doctorId: newDoctor.doctor_id
+            doctorId: newDoctor.doctor_id,
+            short: shortId
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
