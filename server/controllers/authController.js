@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import dotenv from 'dotenv';
 import {Doctor, Patient} from '../models/assc.js';
 import { sendEmail } from '../utils/email.js';
+import { uuidToShort, shortToUuid } from '../utils/shortId.js';
 
 dotenv.config();
 
