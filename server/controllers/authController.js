@@ -4,7 +4,6 @@ import crypto from 'crypto';
 import dotenv from 'dotenv';
 import {Doctor, Patient} from '../models/assc.js';
 import { sendEmail } from '../utils/email.js';
-import { uuidToShort, shortToUuid } from '../utils/shortId.js';
 
 dotenv.config();
 
@@ -14,18 +13,11 @@ export const doctorSignup = async (req, res) => {
         const { name, email, password } = req.body;
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newDoctor = await Doctor.create({
-            name,
-            email,
-            password: hashedPassword,
-        });
-
-        const shortId = uuidToShort(newDoctor.doctor_id);
+        const newDoctor = await Doctor.create({ name, email, password: hashedPassword });
 
         res.status(201).json({
-            message: 'Doctor registered successfully',
-            doctorId: newDoctor.doctor_id,
-            short: shortId
+            message: "Doctor registered successfully",
+            doctorId: newDoctor.doctor_id, 
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -35,24 +27,25 @@ export const doctorSignup = async (req, res) => {
 /** ✅ Patient Signup (Requires a valid Doctor ID) */
 export const patientSignup = async (req, res) => {
     try {
-        const { name, email, password, short_id } = req.body;
+        const { name, email, password, doc_id } = req.body;
 
-        doc_id = shortToUuid(short_id);
-        // Check if the Doctor exists
-        const doctor = await Doctor.findByPk(doc_id);
-        if (!doctor) return res.status(400).json({ message: 'Invalid Doctor ID' });
+        console.log("Received doc_id:", doc_id); // Debugging Log
+
+        // ✅ Check if Doctor ID exists (Expecting a 5-digit string)
+        const doctor = await Doctor.findOne({ where: { doctor_id: String(doc_id) } });
+        if (!doctor) return res.status(400).json({ message: "Invalid Doctor ID" });
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const newPatient = await Patient.create({
             name,
             email,
             password: hashedPassword,
-            doc_id
+            doc_id: String(doc_id), // Ensure it is stored as a string
         });
 
         res.status(201).json({
-            message: 'Patient registered successfully',
-            patientId: newPatient.patient_id
+            message: "Patient registered successfully",
+            patientId: newPatient.patient_id,
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -65,26 +58,26 @@ export const login = async (req, res) => {
         const { email, password, role } = req.body;
 
         let user;
-        if (role === 'doctor') {
+        if (role === "doctor") {
             user = await Doctor.findOne({ where: { email } });
-        } else if (role === 'patient') {
+        } else if (role === "patient") {
             user = await Patient.findOne({ where: { email } });
         } else {
-            return res.status(400).json({ message: 'Invalid role' });
+            return res.status(400).json({ message: "Invalid role" });
         }
 
-        if (!user) return res.status(400).json({ message: 'Invalid credentials' });
+        if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+        if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
         const token = jwt.sign(
-            { id: user.id, role },
+            { id: user[role === "doctor" ? "doctor_id" : "patient_id"], role },
             process.env.JWT_SECRET,
-            { expiresIn: process.env.JWT_EXPIRES_IN || '1d' }
+            { expiresIn: "1d" }
         );
 
-        res.status(200).json({ token, user });
+        res.status(200).json({ token, userId: user[role === "doctor" ? "doctor_id" : "patient_id"] });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
