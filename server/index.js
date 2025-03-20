@@ -5,24 +5,31 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+//import prescriptionRoutes from './routes/prescriptionRoutes.js';
+import prescriptionRoutes from './routes/prescriptionRoutes.js';
+
+
 import authRoutes from './routes/authRoutes.js';
-const bodyParser = require('body-parser');
-const patientRoutes = require('./routes/patientRoutes');
+import bodyParser from 'body-parser';
+//import patientRoutes from './routes/patientRoutes.js';
 
 // Initialize dotenv
 dotenv.config();
 
 const app = express();
 app.use(bodyParser.json());
-app.use('/uploads', express.static('uploads')); // Serve uploaded files
-app.use('/api/patient', patientRoutes);
+//app.use('/uploads', express.static('uploads')); // Serve uploaded files3
+//app.use('/api/patient', patientRoutes);
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+//app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(cookieParser());
 app.use('/api/auth', authRoutes);
+app.use('/api/prescriptions', prescriptionRoutes);
+app.use('/api/prescriptions', prescriptionRoutes);
 
+//app.use('/api/prescriptions', prescriptionRoutes);
 // ... existing code ...
 
 app.get('/', (req, res) => {

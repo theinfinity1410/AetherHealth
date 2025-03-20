@@ -1,6 +1,6 @@
 // authRoutes.js
 import express from 'express';
-import { doctorSignup, patientSignup,login ,forgotPassword ,resetPassword } from '../controllers/authController.js';
+import { doctorSignup, patientSignup,login ,forgotPassword ,resetPassword } from '../controllers/authcontroller.js';
 const router = express.Router();
 
 router.post('/doctor/signup', doctorSignup);
